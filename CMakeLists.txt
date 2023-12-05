@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.20.0)
 add_compile_definitions(MATRIX_COLS=14)
 add_compile_definitions(MATRIX_ROWS=5)
 add_compile_definitions(MAX_LAYER=8)
+add_compile_definitions(KEYBOARD_SHARED_EP)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
@@ -29,7 +30,9 @@ target_sources(
           src/host.c
           src/bootloader.c
           src/keymap_introspection.c
+          src/usb_main.c
           lib/qmk_firmware/tmk_core/protocol/report.c
+          lib/qmk_firmware/tmk_core/protocol/usb_device_state.c
           lib/qmk_firmware/quantum/quantum.c
           lib/qmk_firmware/quantum/keyboard.c
           lib/qmk_firmware/quantum/led.c
