@@ -5,6 +5,7 @@ add_compile_definitions(MATRIX_COLS=14)
 add_compile_definitions(MATRIX_ROWS=5)
 add_compile_definitions(MAX_LAYER=8)
 add_compile_definitions(KEYBOARD_SHARED_EP)
+add_compile_definitions(KEYMAP_C="keymap.h")
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
@@ -13,6 +14,7 @@ target_include_directories(
   app
   PRIVATE include/platforms/zephyr
           include/logging
+          include/keyboard
           lib/qmk_firmware/tmk_core/protocol
           lib/qmk_firmware/quantum
           lib/qmk_firmware/quantum/bootmagic
@@ -29,7 +31,6 @@ target_sources(
           src/eeprom.c
           src/host.c
           src/bootloader.c
-          src/keymap_introspection.c
           src/usb_main.c
           lib/qmk_firmware/tmk_core/protocol/report.c
           lib/qmk_firmware/tmk_core/protocol/usb_device_state.c
@@ -40,7 +41,9 @@ target_sources(
           lib/qmk_firmware/quantum/action_util.c
           lib/qmk_firmware/quantum/action_layer.c
           lib/qmk_firmware/quantum/action_tapping.c
+          lib/qmk_firmware/quantum/action_tapping.c
           lib/qmk_firmware/quantum/keymap_common.c
+          lib/qmk_firmware/quantum/keymap_introspection.c
           lib/qmk_firmware/quantum/keycode_config.c
           lib/qmk_firmware/quantum/eeconfig.c
           lib/qmk_firmware/quantum/bitwise.c
