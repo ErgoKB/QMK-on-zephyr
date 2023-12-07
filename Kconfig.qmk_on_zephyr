@@ -1,0 +1,8 @@
+config MATRIX_COLS
+    int "Number of columns in the matrix" 
+
+config MATRIX_ROWS
+    int "Number of rows in the matrix"
+
+config MAX_LAYER
+    int "Maximum number of keymap layers"

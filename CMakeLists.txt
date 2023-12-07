@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-# Move to keyboard specific setting
-add_compile_definitions(MATRIX_COLS=14)
-add_compile_definitions(MATRIX_ROWS=5)
-add_compile_definitions(MAX_LAYER=8)
+add_compile_definitions(MATRIX_COLS=CONFIG_MATRIX_COLS)
+add_compile_definitions(MATRIX_ROWS=CONFIG_MATRIX_ROWS)
+add_compile_definitions(MAX_LAYER=CONFIG_MAX_LAYER)
 add_compile_definitions(KEYBOARD_SHARED_EP)
 add_compile_definitions(KEYMAP_C="keymap.h")
 
@@ -29,6 +28,7 @@ target_sources(
           src/protocol.c
           src/timer.c
           src/eeprom.c
+          src/matrix.c
           src/host.c
           src/bootloader.c
           src/usb_main.c
