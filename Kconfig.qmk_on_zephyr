@@ -6,3 +6,6 @@ config MATRIX_ROWS
 
 config MAX_LAYER
     int "Maximum number of keymap layers"
+
+config RAW_ENABLE
+    bool "Enable raw HID"

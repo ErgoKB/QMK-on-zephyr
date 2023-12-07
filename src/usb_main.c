@@ -18,6 +18,13 @@ static const struct hid_ops hid_dev_ops = {
     .int_in_ready = in_ready_cb,
 };
 
+static bool via_out_ready = false;
+static const struct device *via_dev;
+static void via_out_ready_cb(const struct device *dev) { via_out_ready = true; }
+static const struct hid_ops via_dev_ops = {
+    .int_out_ready = via_out_ready_cb,
+};
+
 static void usb_status_cb(enum usb_dc_status_code status,
                           const uint8_t *params) {
   usb_status = status;
@@ -33,8 +40,16 @@ void init_usb_driver(void) {
   }
   usb_hid_register_device(hid_dev, hid_kbd_report_desc,
                           sizeof(hid_kbd_report_desc), &hid_dev_ops);
-
   usb_hid_init(hid_dev);
+
+  via_dev = device_get_binding("HID_1");
+  if (via_dev == NULL) {
+    LOG_ERR("Cannot get RAW HID Device");
+    return;
+  }
+  usb_hid_register_device(via_dev, via_hid_report_desc,
+                          sizeof(via_hid_report_desc), &via_dev_ops);
+  usb_hid_init(via_dev);
 
   ret = usb_enable(usb_status_cb);
   if (ret) {
@@ -76,3 +91,28 @@ host_driver_t zephyr_driver = {
     .keyboard_leds = keyboard_leds,
     .send_keyboard = send_keyboard,
 };
+
+#if CONFIG_RAW_ENABLE
+void raw_hid_task(void) {
+  uint8_t buffer[RAW_EPSIZE];
+  uint32_t size = 0;
+  int ret;
+
+  if (!via_out_ready) {
+    return;
+  }
+
+  do {
+    ret = hid_int_ep_read(via_dev, buffer, RAW_EPSIZE, &size);
+    if (ret != 0) {
+      LOG_ERR("Encounter error while receiving data from raw HID endpoint: %d",
+              ret);
+      break;
+    }
+    if (size > 0) {
+      // TODO (lschyi): call via commands
+      LOG_INF("Get data");
+    }
+  } while (size > 0);
+}
+#endif /* CONFIG_RAW_ENABLE */

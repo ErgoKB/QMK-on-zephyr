@@ -12,7 +12,11 @@ void protocol_pre_init(void) { init_usb_driver(); }
 void protocol_post_init(void) {}
 
 void protocol_pre_task(void) {}
-void protocol_post_task(void) {}
+void protocol_post_task(void) {
+#if CONFIG_RAW_ENABLE
+  raw_hid_task();
+#endif /* CONFIG_RAW_ENABLE */
+}
 
 void platform_setup(void) {
   // Hardware initialization.
