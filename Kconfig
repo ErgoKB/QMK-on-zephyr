@@ -1,3 +1,4 @@
 rsource "Kconfig.qmk_on_zephyr"
 
 source "Kconfig.zephyr"
+rsource "src/split/Kconfig"

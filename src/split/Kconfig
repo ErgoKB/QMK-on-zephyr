@@ -1,0 +1,15 @@
+config QMK_ON_ZEPHYR_SPLIT_BLE
+    bool "QMK on zephyr split ble support"
+    select BT
+    select BT_SMP
+    select BT_SMP_SC_PAIR_ONLY
+    select BT_SMP_APP_PAIRING_ACCEPT
+    select BT_SETTINGS
+    select SETTINGS
+    select BT_CENTRAL
+    select BT_GATT_CLIENT
+    select BT_GATT_AUTO_DISCOVER_CCC
+    select BT_USER_PHY_UPDATE
+    select BT_AUTO_PHY_UPDATE
+
+rsource "bluetooth/Kconfig"

@@ -1,0 +1,18 @@
+if QMK_ON_ZEPHYR_SPLIT_BLE
+
+config BLE_INIT_PRIORITY
+    int "BLE init priority"
+    default 50
+
+config ZMK_BLE_SPLIT_CENTRAL_SPLIT_RUN_STACK_SIZE
+    int "BLE split central write thread stack size"
+    default 512
+
+config ZMK_BLE_THREAD_PRIORITY
+    int "BLE notify thread priority"
+    default 5
+
+config ZMK_BLE_SPLIT_PERIPHERAL_COUNT
+    int "Number of split to connect to"
+
+endif

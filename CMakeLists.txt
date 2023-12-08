@@ -12,7 +12,8 @@ project(qmk_on_zephyr)
 
 target_include_directories(
   app
-  PRIVATE include/platforms/zephyr
+  PRIVATE include
+          include/platforms/zephyr
           include/logging
           include/keyboard
           lib/qmk_firmware/tmk_core/protocol
@@ -54,3 +55,5 @@ target_sources(
           lib/qmk_firmware/quantum/logging/sendchar.c
           lib/qmk_firmware/quantum/logging/debug.c
           lib/qmk_firmware/quantum/bootmagic/magic.c)
+
+add_subdirectory(src/split)
