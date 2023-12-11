@@ -1,4 +1,5 @@
 #include "zmk/split/bluetooth/connection.h"
+#include "zmk/split/bluetooth/key_queue.h"
 #include "zmk/split/bluetooth/slot.h"
 #include "zmk/split/bluetooth/uuid.h"
 
@@ -6,6 +7,8 @@
 #include <zephyr/bluetooth/hci.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(ble_central, 3);
+
+K_MSGQ_DEFINE(key_queue, sizeof(struct key_event), 30, 1);
 
 static const struct bt_uuid_128 split_service_uuid =
     BT_UUID_INIT_128(ZMK_SPLIT_BT_SERVICE_UUID);
@@ -272,25 +275,20 @@ split_central_notify_func(struct bt_conn *conn,
     LOG_DBG("data: %d", slot->position_state[i]);
   }
 
-  /* TODO (lschyi): handle keypress event
   for (int i = 0; i < POSITION_STATE_DATA_LEN; i++) {
-      for (int j = 0; j < 8; j++) {
-          if (slot->changed_positions[i] & BIT(j)) {
-              uint32_t position = (i * 8) + j;
-              bool pressed = slot->position_state[i] & BIT(j);
-              struct zmk_position_state_changed ev = {.source =
-                                                          peripheral_slot_index_for_conn(conn),
-                                                      .position = position,
-                                                      .state = pressed,
-                                                      .timestamp =
-  k_uptime_get()};
+    for (int j = 0; j < 8; j++) {
+      if (slot->changed_positions[i] & BIT(j)) {
+        uint32_t position = (i * 8) + j;
+        bool pressed = slot->position_state[i] & BIT(j);
+        struct key_event ev = {
+            .position = position,
+            .pressed = pressed,
+        };
 
-              k_msgq_put(&peripheral_event_msgq, &ev, K_NO_WAIT);
-              k_work_submit(&peripheral_event_work);
-          }
+        k_msgq_put(&key_queue, &ev, K_NO_WAIT);
       }
+    }
   }
-  */
 
   return BT_GATT_ITER_CONTINUE;
 }
