@@ -7,6 +7,7 @@
 
 // clang-format off
 static const uint8_t hid_kbd_report_desc[] = {
+    // keyboard
     HID_USAGE_PAGE(HID_USAGE_GEN_DESKTOP),
     HID_USAGE(HID_USAGE_GEN_DESKTOP_KEYBOARD),
     HID_COLLECTION(HID_COLLECTION_APPLICATION),
@@ -34,6 +35,35 @@ static const uint8_t hid_kbd_report_desc[] = {
         HID_REPORT_SIZE(8),
         HID_REPORT_COUNT(6),
         HID_INPUT(0x00),
+    HID_END_COLLECTION,
+    // mouse
+    // system control
+    HID_USAGE_PAGE(HID_USAGE_GEN_DESKTOP),
+    HID_USAGE(0x80),
+    HID_COLLECTION(HID_COLLECTION_APPLICATION),
+        HID_REPORT_ID(3),
+        0x19, 0x01,       // Usage Minimum (Pointer)
+        0x2A, 0xB7, 0x00, // Usage Maximum (Sys Display LCD Autoscale)
+        0x15, 0x01,       // Logical Minimum (1)
+        0x26, 0xB7, 0x00, // Logical Maximum (183)
+        0x95, 0x01,       // Report Count (1)
+        0x75, 0x10,       // Report Size (16)
+        0x81, 0x00,       // Input (Data,Array,Abs,No Wrap,Linear,Preferred
+                          // State,No Null Position)
+    HID_END_COLLECTION,
+    // consumer report
+    HID_USAGE_PAGE(0x0C), // Usage Page (Consumer)
+    0x09, 0x01,           // Usage (Consumer Control)
+    HID_COLLECTION(HID_COLLECTION_APPLICATION),
+        HID_REPORT_ID(4),
+        0x19, 0x01,       // Usage Minimum (Consumer Control)
+        0x2A, 0xA0, 0x02, // Usage Maximum (0x02A0)
+        0x15, 0x01,       // Logical Minimum (1)
+        0x26, 0xA0, 0x02, // Logical Maximum (672)
+        0x95, 0x01,       // Report Count (1)
+        0x75, 0x10,       // Report Size (16)
+        0x81, 0x00,       // Input (Data,Array,Abs,No Wrap,Linear,Preferred
+                          // State,No Null Position)
     HID_END_COLLECTION,
 };
 

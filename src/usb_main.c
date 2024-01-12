@@ -87,9 +87,16 @@ static void send_keyboard(report_keyboard_t *report) {
   send_report((uint8_t *)&(report->report_id), KEYBOARD_REPORT_SIZE);
 };
 
+static void send_extra(report_extra_t *report) {
+#if CONFIG_EXTRAKEY_ENABLE
+  send_report((uint8_t *)report, sizeof(report_extra_t));
+#endif /* CONFIG_EXTRAKEY_ENABLE */
+}
+
 host_driver_t zephyr_driver = {
     .keyboard_leds = keyboard_leds,
     .send_keyboard = send_keyboard,
+    .send_extra = send_extra,
 };
 
 #if CONFIG_RAW_ENABLE

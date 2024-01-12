@@ -9,3 +9,6 @@ config MAX_LAYER
 
 config RAW_ENABLE
     bool "Enable raw HID"
+
+config EXTRAKEY_ENABLE
+    bool "Enable system and consumer key"

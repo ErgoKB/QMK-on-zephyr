@@ -5,6 +5,7 @@ add_compile_definitions(MATRIX_ROWS=CONFIG_MATRIX_ROWS)
 add_compile_definitions(MAX_LAYER=CONFIG_MAX_LAYER)
 add_compile_definitions(RAW_ENABLE=CONFIG_RAW_ENABLE)
 add_compile_definitions(KEYBOARD_SHARED_EP)
+add_compile_definitions(EXTRAKEY_ENABLE=CONFIG_EXTRAKEY_ENABLE)
 add_compile_definitions(KEYMAP_C="keymap.h")
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
