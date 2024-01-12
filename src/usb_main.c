@@ -87,6 +87,11 @@ static void send_keyboard(report_keyboard_t *report) {
   send_report((uint8_t *)&(report->report_id), KEYBOARD_REPORT_SIZE);
 };
 
+static void send_mouse(report_mouse_t *report) {
+  report->report_id = 2;
+  send_report((uint8_t *)report, sizeof(report_mouse_t));
+}
+
 static void send_extra(report_extra_t *report) {
 #if CONFIG_EXTRAKEY_ENABLE
   send_report((uint8_t *)report, sizeof(report_extra_t));
@@ -96,6 +101,7 @@ static void send_extra(report_extra_t *report) {
 host_driver_t zephyr_driver = {
     .keyboard_leds = keyboard_leds,
     .send_keyboard = send_keyboard,
+    .send_mouse = send_mouse,
     .send_extra = send_extra,
 };
 

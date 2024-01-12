@@ -5,6 +5,9 @@ add_compile_definitions(MATRIX_ROWS=CONFIG_MATRIX_ROWS)
 add_compile_definitions(MAX_LAYER=CONFIG_MAX_LAYER)
 add_compile_definitions(RAW_ENABLE=CONFIG_RAW_ENABLE)
 add_compile_definitions(KEYBOARD_SHARED_EP)
+add_compile_definitions(MOUSE_ENABLE=CONFIG_MOUSE_ENABLE)
+add_compile_definitions(MOUSE_SHARED_EP)
+add_compile_definitions(MOUSEKEY_ENABLE=CONFIG_MOUSE_ENABLE)
 add_compile_definitions(EXTRAKEY_ENABLE=CONFIG_EXTRAKEY_ENABLE)
 add_compile_definitions(KEYMAP_C="keymap.h")
 
@@ -55,6 +58,7 @@ target_sources(
           lib/qmk_firmware/quantum/logging/print.c
           lib/qmk_firmware/quantum/logging/sendchar.c
           lib/qmk_firmware/quantum/logging/debug.c
+          lib/qmk_firmware/quantum/mousekey.c
           lib/qmk_firmware/quantum/bootmagic/magic.c)
 
 add_subdirectory(src/split)

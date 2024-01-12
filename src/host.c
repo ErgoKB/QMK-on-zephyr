@@ -13,6 +13,10 @@ void host_keyboard_send(report_keyboard_t *report) {
   zephyr_driver.send_keyboard(report);
 }
 
+void host_mouse_send(report_mouse_t *report) {
+  zephyr_driver.send_mouse(report);
+}
+
 void host_system_send(uint16_t usage) {
   if (usage == last_system_usage)
     return;
