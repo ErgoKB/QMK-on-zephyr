@@ -15,3 +15,12 @@ config MOUSE_ENABLE
 
 config EXTRAKEY_ENABLE
     bool "Enable system and consumer key"
+
+config VIA_ENABLE
+    bool "Enable VIA"
+
+config FEE_PAGE_SIZE 
+    int "Flash page size in MCU. Used when emulating EEPROM"
+
+config FEE_PAGE_COUNT 
+    int "Flash page count. Used when emulating EEPROM"

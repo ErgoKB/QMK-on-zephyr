@@ -14,6 +14,7 @@ add_compile_definitions(KEYMAP_C="keymap.h")
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
 
+target_compile_definitions_ifdef(CONFIG_VIA_ENABLE app PRIVATE EEPROM_DRIVER)
 target_include_directories(
   app
   PRIVATE include
@@ -22,6 +23,7 @@ target_include_directories(
           include/keyboard
           lib/qmk_firmware/tmk_core/protocol
           lib/qmk_firmware/quantum
+          lib/qmk_firmware/drivers/eeprom
           lib/qmk_firmware/quantum/bootmagic
           lib/qmk_firmware/quantum/logging
           lib/qmk_firmware/quantum/keymap_extras
@@ -33,7 +35,6 @@ target_sources(
   PRIVATE src/main.c
           src/protocol.c
           src/timer.c
-          src/eeprom.c
           src/matrix.c
           src/host.c
           src/bootloader.c
@@ -62,3 +63,6 @@ target_sources(
           lib/qmk_firmware/quantum/bootmagic/magic.c)
 
 add_subdirectory(src/split)
+
+target_sources_ifdef(
+  CONFIG_VIA_ENABLE app PRIVATE src/eeprom_emulated_flash.c)
