@@ -106,8 +106,16 @@ host_driver_t zephyr_driver = {
 };
 
 #if CONFIG_RAW_ENABLE
+void raw_hid_send(uint8_t *data, uint8_t length) {
+  int err = hid_int_ep_write(via_dev, data, length, NULL);
+  if (err) {
+    LOG_ERR("Failed to write data via raw hid endpoint, err = %d", err);
+  }
+}
+
 void raw_hid_task(void) {
-  uint8_t buffer[RAW_EPSIZE];
+  static uint8_t buffer[RAW_EPSIZE];
+  static uint8_t idx = 0;
   uint32_t size = 0;
   int ret;
 
@@ -116,15 +124,24 @@ void raw_hid_task(void) {
   }
 
   do {
-    ret = hid_int_ep_read(via_dev, buffer, RAW_EPSIZE, &size);
+    ret = hid_int_ep_read(via_dev, buffer + idx, RAW_EPSIZE, &size);
     if (ret != 0) {
       LOG_ERR("Encounter error while receiving data from raw HID endpoint: %d",
               ret);
       break;
     }
     if (size > 0) {
-      // TODO (lschyi): call via commands
-      LOG_INF("Get data");
+      idx += size;
+      if (idx > RAW_EPSIZE) {
+        LOG_ERR("Got RAW HID transaction more thant RAW_EPSIZE(%d) bytes",
+                RAW_EPSIZE);
+        idx = 0;
+        return;
+      }
+      if (idx == RAW_EPSIZE) {
+        raw_hid_receive(buffer, sizeof(buffer));
+        idx = 0;
+      }
     }
   } while (size > 0);
 }
