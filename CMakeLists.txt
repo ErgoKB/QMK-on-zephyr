@@ -14,7 +14,15 @@ add_compile_definitions(KEYMAP_C="keymap.h")
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
 
+target_compile_definitions_ifdef(CONFIG_VIA_ENABLE app PRIVATE VIA_ENABLE)
+target_compile_definitions_ifdef(CONFIG_VIA_ENABLE app PRIVATE
+                                 DYNAMIC_KEYMAP_ENABLE)
 target_compile_definitions_ifdef(CONFIG_VIA_ENABLE app PRIVATE EEPROM_DRIVER)
+if(${CONFIG_VIA_ENABLE})
+  add_compile_definitions(QMK_BUILDDATE="2024-01-12-20:36:00")
+  add_compile_definitions(TOTAL_EEPROM_BYTE_COUNT=1024)
+endif()
+
 target_include_directories(
   app
   PRIVATE include
@@ -28,6 +36,7 @@ target_include_directories(
           lib/qmk_firmware/quantum/logging
           lib/qmk_firmware/quantum/keymap_extras
           lib/qmk_firmware/quantum/sequencer
+          lib/qmk_firmware/quantum/send_string
           lib/qmk_firmware/platforms)
 
 target_sources(
@@ -65,4 +74,8 @@ target_sources(
 add_subdirectory(src/split)
 
 target_sources_ifdef(
-  CONFIG_VIA_ENABLE app PRIVATE src/eeprom_emulated_flash.c)
+  CONFIG_VIA_ENABLE app PRIVATE src/eeprom_emulated_flash.c
+  lib/qmk_firmware/quantum/via.c
+  lib/qmk_firmware/drivers/eeprom/eeprom_driver.c
+  lib/qmk_firmware/quantum/dynamic_keymap.c
+  lib/qmk_firmware/quantum/send_string/send_string.c)
