@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <zephyr/bluetooth/conn.h>
 
+#if IS_ENABLED(CONFIG_SETTINGS)
+extern uint8_t recorded_peripherals;
+#endif /* IS_ENABLED(CONFIG_SETTINGS) */
 void set_is_provisioning(bool);
 void start_scan(void);
 void split_central_connected(struct bt_conn *conn, uint8_t conn_err);

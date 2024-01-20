@@ -51,6 +51,7 @@ target_sources(
           src/host.c
           src/bootloader.c
           src/usb_main.c
+          src/phoenix_pro/via_custom.c
           lib/qmk_firmware/tmk_core/protocol/report.c
           lib/qmk_firmware/tmk_core/protocol/usb_device_state.c
           lib/qmk_firmware/quantum/quantum.c
