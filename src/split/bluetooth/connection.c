@@ -13,7 +13,9 @@ K_MSGQ_DEFINE(key_queue, sizeof(struct key_event), 30, 1);
 static const struct bt_uuid_128 split_service_uuid =
     BT_UUID_INIT_128(ZMK_SPLIT_BT_SERVICE_UUID);
 
-static bool is_provisioning = true;
+#if IS_ENABLED(CONFIG_SETTINGS)
+uint8_t recorded_peripherals = 0;
+#endif /* IS_ENABLED(CONFIG_SETTINGS) */
 
 static void find_split_device(const bt_addr_le_t *addr, int8_t rssi,
                               uint8_t type, struct net_buf_simple *ad);
@@ -36,8 +38,6 @@ static uint8_t
 split_central_notify_func(struct bt_conn *conn,
                           struct bt_gatt_subscribe_params *params,
                           const void *data, uint16_t length);
-
-void set_is_provisioning(bool val) { is_provisioning = val; }
 
 /*
  * split_central_disconnected performs device disconnected clean up, and
@@ -71,7 +71,13 @@ void split_central_disconnected(struct bt_conn *conn, uint8_t reason) {
   }
 
   release_peripheral_slot(slot);
+#if IS_ENABLED(CONFIG_SETTINGS)
+  if (recorded_peripherals != CONFIG_ZMK_BLE_SPLIT_PERIPHERAL_COUNT) {
+    bt_unpair(BT_ID_DEFAULT, bt_conn_get_dst(conn));
+  }
+#else
   bt_unpair(BT_ID_DEFAULT, bt_conn_get_dst(conn));
+#endif /* IS_ENABLED(CONFIG_SETTINGS) */
 
   start_scan();
 }
@@ -175,9 +181,15 @@ void start_scan(void) {
     LOG_DBG("No empty slot, no need to scan");
     return;
   }
-  if (!is_provisioning) {
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+  if (recorded_peripherals == CONFIG_ZMK_BLE_SPLIT_PERIPHERAL_COUNT) {
+    LOG_INF("All peripherals slot are recorded, apply filter");
     options |= BT_LE_SCAN_OPT_FILTER_ACCEPT_LIST;
+  } else {
+    LOG_INF("Not all slot are recorded, do not apply filter");
   }
+#endif /* IS_ENABLED(CONFIG_SETTINGS) */
 
   err = bt_le_scan_start(BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE, options,
                                           BT_GAP_SCAN_FAST_INTERVAL,
