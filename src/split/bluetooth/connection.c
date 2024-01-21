@@ -99,6 +99,21 @@ void split_central_disconnected(struct bt_conn *conn, uint8_t reason) {
 
   bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
   LOG_DBG("Disconnected: %s (reason %d)", addr, reason);
+
+  struct peripheral_slot *slot = get_slot_by_connection(conn);
+  for (int i = 0; i < POSITION_STATE_DATA_LEN; i++) {
+    for (int j = 0; j < 8; j++) {
+      if (slot->position_state[i] & BIT(j)) {
+        uint32_t position = (i * 8) + j;
+        struct key_event ev = {
+            .position = position,
+            .pressed = false,
+        };
+        k_msgq_put(&key_queue, &ev, K_NO_WAIT);
+      }
+    }
+  }
+
   release_peripheral_slot_for_conn(conn);
   bt_unpair(BT_ID_DEFAULT, bt_conn_get_dst(conn));
 

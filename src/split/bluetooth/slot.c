@@ -59,9 +59,6 @@ void release_peripheral_slot(int index) {
   }
   slot->state = PERIPHERAL_SLOT_STATE_OPEN;
 
-  // TODO (lschyi)
-  // Raise events releasing any active positions from this peripheral
-
   for (int i = 0; i < POSITION_STATE_DATA_LEN; i++) {
     slot->position_state[i] = 0U;
     slot->changed_positions[i] = 0U;
