@@ -10,6 +10,9 @@ add_compile_definitions(MOUSE_SHARED_EP)
 add_compile_definitions(MOUSEKEY_ENABLE=CONFIG_MOUSE_ENABLE)
 add_compile_definitions(EXTRAKEY_ENABLE=CONFIG_EXTRAKEY_ENABLE)
 add_compile_definitions(KEYMAP_C="keymap.h")
+add_compile_definitions(PERMISSIVE_HOLD)
+add_compile_definitions(IGNORE_MOD_TAP_INTERRUPT)
+add_compile_definitions(TAPPING_TOGGLE=2)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
@@ -47,6 +50,7 @@ target_sources(
   PRIVATE src/main.c
           src/protocol.c
           src/timer.c
+          src/keymap.c
           src/matrix.c
           src/host.c
           src/bootloader.c

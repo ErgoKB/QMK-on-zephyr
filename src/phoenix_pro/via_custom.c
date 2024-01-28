@@ -46,10 +46,10 @@ static void custom_get_value(uint8_t *data, uint8_t length) {
 void via_custom_value_command(uint8_t *data, uint8_t length) {
   LOG_HEXDUMP_DBG(data, length, "via custom value command");
   switch (data[0]) {
-  case id_custom_set_value:
+  case id_lighting_set_value:
     custom_set_value(data, length);
     break;
-  case id_custom_get_value:
+  case id_lighting_get_value:
     custom_get_value(data, length);
     break;
   default:
