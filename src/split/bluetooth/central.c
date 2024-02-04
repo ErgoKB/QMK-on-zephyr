@@ -25,7 +25,6 @@ static struct bt_conn_cb conn_callbacks = {
 };
 
 #if IS_ENABLED(CONFIG_SETTINGS)
-static bt_addr_le_t peripheral_addrs[CONFIG_ZMK_BLE_SPLIT_PERIPHERAL_COUNT];
 static inline bool can_addr_filter() {
   return recorded_peripherals == ARRAY_SIZE(peripheral_addrs);
 }
