@@ -16,6 +16,7 @@ static const struct bt_uuid_128 split_service_uuid =
 static bool is_scanning = false;
 
 #if IS_ENABLED(CONFIG_SETTINGS)
+bt_addr_le_t peripheral_addrs[CONFIG_ZMK_BLE_SPLIT_PERIPHERAL_COUNT];
 uint8_t recorded_peripherals = 0;
 #endif /* IS_ENABLED(CONFIG_SETTINGS) */
 
@@ -85,13 +86,10 @@ bool split_central_connected_work(struct bt_conn *conn, uint8_t conn_err) {
     return false;
   }
 
-  if (conn_info.role == BT_CONN_ROLE_CENTRAL) {
-    LOG_INF("Role is central, setting security");
-    int err = bt_conn_set_security(conn, BT_SECURITY_L2);
-    if (err) {
-      LOG_ERR("Failed to set security; %d", err);
-      return false;
-    }
+  int err = bt_conn_set_security(conn, BT_SECURITY_L2);
+  if (err) {
+    LOG_ERR("Failed to set security; %d", err);
+    return false;
   }
 
   struct peripheral_slot *slot = get_slot_by_connection(conn);
@@ -147,9 +145,11 @@ void start_scan(void) {
     LOG_DBG("Already scanning, skip");
     return;
   }
+  is_scanning = true;
 
   if (!has_open_slot()) {
     LOG_DBG("No empty slot, no need to scan");
+    is_scanning = false;
     return;
   }
   uint32_t options = BT_LE_SCAN_OPT_FILTER_DUPLICATE;
@@ -167,9 +167,9 @@ void start_scan(void) {
                              device_found);
   if (err) {
     LOG_ERR("Scanning failed to start (err %d)", err);
+    is_scanning = false;
     return;
   }
-  is_scanning = true;
   LOG_DBG("Scanning successfully");
 }
 
@@ -180,20 +180,21 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
     return;
   }
 
-  /* TODO (lschyi): this is a boost
-  const bt_addr_le_t *peripheral_addrs = zmk_ble_get_peripheral_addrs();
-  for (int i = 0; i < ZMK_BLE_SPLIT_PERIPHERAL_COUNT; i++) {
+  bool is_remembered_device = false;
+  for (int i = 0; i < ARRAY_SIZE(peripheral_addrs); i++) {
     if (bt_addr_le_cmp(&peripheral_addrs[i], addr) == 0) {
-      LOG_INF("found remembered device, try connect it without checking");
-      split_central_eir_found(addr);
-      return;
+      LOG_DBG("found remembered device, try connect it without checking");
+      is_remembered_device = true;
+      break;
     }
   }
-  */
-  bool is_split_service = false;
-  bt_data_parse(ad, parse_device_data, (void *)&is_split_service);
-  if (!is_split_service) {
-    return;
+
+  if (!is_remembered_device) {
+    bool is_split_service = false;
+    bt_data_parse(ad, parse_device_data, (void *)&is_split_service);
+    if (!is_split_service) {
+      return;
+    }
   }
 
   int err = bt_le_scan_stop();
