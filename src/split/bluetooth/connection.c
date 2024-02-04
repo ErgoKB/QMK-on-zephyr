@@ -14,6 +14,7 @@ static const struct bt_uuid_128 split_service_uuid =
     BT_UUID_INIT_128(ZMK_SPLIT_BT_SERVICE_UUID);
 
 #if IS_ENABLED(CONFIG_SETTINGS)
+bt_addr_le_t peripheral_addrs[CONFIG_ZMK_BLE_SPLIT_PERIPHERAL_COUNT];
 uint8_t recorded_peripherals = 0;
 #endif /* IS_ENABLED(CONFIG_SETTINGS) */
 
@@ -212,19 +213,20 @@ static void find_split_device(const bt_addr_le_t *addr, int8_t rssi,
     return;
   }
 
-  /* TODO (lschyi): this is a boost
-  const bt_addr_le_t *peripheral_addrs = zmk_ble_get_peripheral_addrs();
-  for (int i = 0; i < ZMK_BLE_SPLIT_PERIPHERAL_COUNT; i++) {
+  bool is_remembered_device = false;
+  for (int i = 0; i < ARRAY_SIZE(peripheral_addrs); i++) {
     if (bt_addr_le_cmp(&peripheral_addrs[i], addr) == 0) {
-      LOG_INF("found remembered device, try connect it without checking");
-      split_central_eir_found(addr);
-      return;
+      LOG_DBG("found remembered device, try connect it without checking");
+      is_remembered_device = true;
+      break;
     }
   }
-  */
-  bt_data_parse(ad, parse_device_data, (void *)&is_split_service);
-  if (!is_split_service) {
-    return;
+
+  if (!is_remembered_device) {
+    bt_data_parse(ad, parse_device_data, (void *)&is_split_service);
+    if (!is_split_service) {
+      return;
+    }
   }
 
   /*
