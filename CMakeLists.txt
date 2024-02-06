@@ -38,9 +38,11 @@ target_include_directories(
           lib/qmk_firmware/tmk_core/protocol
           lib/qmk_firmware/quantum
           lib/qmk_firmware/drivers/eeprom
+          lib/qmk_firmware/quantum/audio
           lib/qmk_firmware/quantum/bootmagic
           lib/qmk_firmware/quantum/logging
           lib/qmk_firmware/quantum/keymap_extras
+          lib/qmk_firmware/quantum/process_keycode
           lib/qmk_firmware/quantum/sequencer
           lib/qmk_firmware/quantum/send_string
           lib/qmk_firmware/platforms)
@@ -67,7 +69,6 @@ target_sources(
           lib/qmk_firmware/quantum/action_tapping.c
           lib/qmk_firmware/quantum/action_tapping.c
           lib/qmk_firmware/quantum/keymap_common.c
-          lib/qmk_firmware/quantum/keymap_introspection.c
           lib/qmk_firmware/quantum/keycode_config.c
           lib/qmk_firmware/quantum/eeconfig.c
           lib/qmk_firmware/quantum/bitwise.c
@@ -86,4 +87,4 @@ target_sources_ifdef(
   lib/qmk_firmware/quantum/via.c
   lib/qmk_firmware/drivers/eeprom/eeprom_driver.c
   lib/qmk_firmware/quantum/dynamic_keymap.c
-  lib/qmk_firmware/quantum/send_string/send_string.c)
+  lib/qmk_firmware/quantum/send_string.c)
