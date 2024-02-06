@@ -22,11 +22,7 @@ void host_system_send(uint16_t usage) {
     return;
   last_system_usage = usage;
 
-  report_extra_t report = {
-      .report_id = REPORT_ID_SYSTEM,
-      .usage = usage,
-  };
-  zephyr_driver.send_extra(&report);
+  zephyr_driver.send_system(usage);
 }
 
 void host_consumer_send(uint16_t usage) {
@@ -34,9 +30,5 @@ void host_consumer_send(uint16_t usage) {
     return;
   last_consumer_usage = usage;
 
-  report_extra_t report = {
-      .report_id = REPORT_ID_CONSUMER,
-      .usage = usage,
-  };
-  zephyr_driver.send_extra(&report);
+  zephyr_driver.send_consumer(usage);
 }

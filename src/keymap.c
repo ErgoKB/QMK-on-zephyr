@@ -3,7 +3,7 @@
 #include "keyboard.h"
 #include "keymap.h"
 
-extern const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [BASE] = LAYOUT_phoenix(
     KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_GRV,
     KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_LCTL,

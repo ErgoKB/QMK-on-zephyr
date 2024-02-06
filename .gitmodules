@@ -1,3 +1,4 @@
 [submodule "lib/qmk_firmware"]
 	path = lib/qmk_firmware
-	url = https://github.com/qmk/qmk_firmware.git
+	url = https://github.com/ErgoKB/qmk_firmware.git
+	branch = main
