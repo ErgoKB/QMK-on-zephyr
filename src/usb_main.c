@@ -92,17 +92,28 @@ static void send_mouse(report_mouse_t *report) {
   send_report((uint8_t *)report, sizeof(report_mouse_t));
 }
 
-static void send_extra(report_extra_t *report) {
+static void send_extra(uint8_t report_id, uint16_t data) {
 #if CONFIG_EXTRAKEY_ENABLE
-  send_report((uint8_t *)report, sizeof(report_extra_t));
+  static report_extra_t report;
+  report = (report_extra_t){.report_id = report_id, .usage = data};
+  send_report((uint8_t *)&report, sizeof(report_extra_t));
 #endif /* CONFIG_EXTRAKEY_ENABLE */
+}
+
+static void send_system(uint16_t usage) {
+  send_extra(REPORT_ID_SYSTEM, usage);
+}
+
+static void send_consumer(uint16_t usage) {
+  send_extra(REPORT_ID_CONSUMER, usage);
 }
 
 host_driver_t zephyr_driver = {
     .keyboard_leds = keyboard_leds,
     .send_keyboard = send_keyboard,
     .send_mouse = send_mouse,
-    .send_extra = send_extra,
+    .send_system = send_system,
+    .send_consumer = send_consumer,
 };
 
 #if CONFIG_RAW_ENABLE
