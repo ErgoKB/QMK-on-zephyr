@@ -1,8 +1,11 @@
 #include "via.h"
 #include "zmk/split/bluetooth/central.h"
 
+#include <hal/nrf_power.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(via_custom, 4);
+
+#define DFU_MAGIC_UF2_RESET 0x57
 
 static void set_pair_addr(uint8_t *data, uint8_t length) {
   switch (data[2]) {
@@ -24,10 +27,18 @@ static void set_pair_addr(uint8_t *data, uint8_t length) {
   }
 }
 
+static void enter_dfu() {
+  nrf_power_gpregret_set(NRF_POWER, 0, DFU_MAGIC_UF2_RESET);
+  NVIC_SystemReset();
+}
+
 static void custom_set_value(uint8_t *data, uint8_t length) {
   switch (data[1]) {
   case 0:
     set_pair_addr(data, length);
+    break;
+  case 2:
+    enter_dfu();
     break;
   default:
     LOG_WRN("unsupported via custom set command: 0x%x", data[1]);
