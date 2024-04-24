@@ -24,3 +24,6 @@ config FEE_PAGE_SIZE
 
 config FEE_PAGE_COUNT 
     int "Flash page count. Used when emulating EEPROM"
+
+config SWAP_HANDS_ENABLE
+    bool "Enable swap hands"

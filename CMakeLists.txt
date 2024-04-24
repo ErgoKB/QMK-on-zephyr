@@ -22,6 +22,9 @@ if(${CONFIG_VIA_ENABLE})
   add_compile_definitions(QMK_BUILDDATE="2024-01-12-20:36:00")
   add_compile_definitions(TOTAL_EEPROM_BYTE_COUNT=1024)
 endif()
+if(${CONFIG_VIA_ENABLE})
+  add_compile_definitions(SWAP_HANDS_ENABLE)
+endif()
 
 target_include_directories(
   app
