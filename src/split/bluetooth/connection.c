@@ -278,6 +278,7 @@ split_central_notify_func(struct bt_conn *conn,
 
   if (!data) {
     LOG_DBG("[UNSUBSCRIBED]");
+    bt_conn_disconnect(conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
     params->value_handle = 0U;
     return BT_GATT_ITER_STOP;
   }
