@@ -351,8 +351,14 @@ static uint8_t eeprom_compact(void) {
     FLASH_Status final_status = FLASH_COMPLETE;
 
     /* Write emulated eeprom contents from memory to compacted flash */
-    if (write_to_flash(FEE_COMPACTED_BASE_ADDRESS, WordBuf, FEE_DENSITY_BYTES)) {
+    for (int i = 0; i < FEE_DENSITY_BYTES / 2; i++) {
+        WordBuf[i] = ~WordBuf[i];
+    }
+    if (write_to_flash(FEE_COMPACTED_BASE_ADDRESS, WordBuf, sizeof(WordBuf))) {
         LOG_ERR("Failed to write compact data to flash!");
+    }
+    for (int i = 0; i < FEE_DENSITY_BYTES / 2; i++) {
+        WordBuf[i] = ~WordBuf[i];
     }
 
     if (debug_eeprom) {
