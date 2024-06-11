@@ -117,6 +117,13 @@ void clear_bond() {
 #endif /* IS_ENABLED(CONFIG_SETTINGS) */
 }
 
+void clear_bond_secrets() {
+#if IS_ENABLED(CONFIG_SETTINGS)
+  LOG_DBG("Clear bonding secrets");
+  bt_unpair(BT_ID_DEFAULT, NULL);
+#endif /* IS_ENABLED(CONFIG_SETTINGS) */
+}
+
 void set_peripheral_addr(uint8_t *data, int idx) {
 #if IS_ENABLED(CONFIG_SETTINGS)
   bt_addr_le_t addr = {
