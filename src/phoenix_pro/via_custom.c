@@ -17,6 +17,8 @@ static void set_pair_addr(uint8_t *data, uint8_t length) {
   case 4:
     clear_peripheral(data[2] - 3);
     break;
+  case 5:
+    clear_bond_secrets();
   default:
     LOG_WRN("unsupported set addr command: 0x%x", data[2]);
   }
