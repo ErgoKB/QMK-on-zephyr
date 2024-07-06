@@ -68,6 +68,13 @@ static const uint8_t hid_kbd_report_desc[] = {
             HID_REPORT_COUNT(1),
             HID_REPORT_SIZE(8),
             HID_INPUT(0x06),
+            HID_USAGE_PAGE(0x0C), // Usage Page (Consumer)
+            0x0A, 0x38, 0x02, // Usage (AC Pan)
+            HID_LOGICAL_MIN8(-127),
+            HID_LOGICAL_MAX8(127),
+            HID_REPORT_COUNT(1),
+            HID_REPORT_SIZE(8),
+            HID_INPUT(0x06),
         HID_END_COLLECTION,
     HID_END_COLLECTION,
     // system control
