@@ -10,6 +10,25 @@
 #include <zephyr/usb/usb_device.h>
 LOG_MODULE_DECLARE(qmk_on_zephyr);
 
+#define USB_SEND_INTERVAL K_MSEC(10)
+
+typedef union {
+  report_keyboard_t keyboard_report;
+  report_mouse_t mouse_report;
+#if CONFIG_EXTRAKEY_ENABLE
+  report_extra_t consume_report;
+#endif /* CONFIG_EXTRAKEY_ENABLE */
+} hid_report;
+
+enum Report { Keyboard, Mouse, Consumer };
+
+typedef struct {
+  enum Report type;
+  hid_report report;
+} hid_queue_item;
+
+K_MSGQ_DEFINE(hid_report_queue, sizeof(hid_queue_item), 50, 1);
+
 static K_SEM_DEFINE(hid_sem, 1, 1);
 
 static enum usb_dc_status_code usb_status = USB_DC_UNKNOWN;
@@ -73,31 +92,32 @@ static int send_report(uint8_t *report, size_t len) {
   case USB_DC_UNKNOWN:
     return -ENODEV;
   default:
-    k_sem_take(&hid_sem, K_MSEC(30));
-    int err = hid_int_ep_write(hid_dev, report, len, NULL);
-
-    if (err) {
-      k_sem_give(&hid_sem);
-    }
-
-    return err;
+    return hid_int_ep_write(hid_dev, report, len, NULL);
   }
 }
 
 static void send_keyboard(report_keyboard_t *report) {
   // TODO (lschyi) handle boot protocol, do not send ep and other things
   report->report_id = 1;
-  send_report((uint8_t *)&(report->report_id), KEYBOARD_REPORT_SIZE);
+  hid_queue_item item = {.type = Keyboard};
+  memcpy(&(item.report), report, sizeof(report_keyboard_t));
+  k_msgq_put(&hid_report_queue, &item, K_NO_WAIT);
 };
 
 static void send_mouse(report_mouse_t *report) {
   report->report_id = 2;
-  send_report((uint8_t *)report, sizeof(report_mouse_t));
+  k_sem_take(&hid_sem, USB_SEND_INTERVAL);
+  int err = send_report((uint8_t *)report, sizeof(report_mouse_t));
+  if (err) {
+    k_sem_give(&hid_sem);
+  }
 }
 
 static void send_extra(report_extra_t *report) {
 #if CONFIG_EXTRAKEY_ENABLE
-  send_report((uint8_t *)report, sizeof(report_extra_t));
+  hid_queue_item item = {.type = Consumer};
+  memcpy(&(item.report), report, sizeof(report_extra_t));
+  k_msgq_put(&hid_report_queue, &item, K_NO_WAIT);
 #endif /* CONFIG_EXTRAKEY_ENABLE */
 }
 
@@ -149,3 +169,38 @@ void raw_hid_task(void) {
   } while (size > 0);
 }
 #endif /* CONFIG_RAW_ENABLE */
+
+static void send_report_with_retry(uint8_t *report, size_t len, uint8_t retry) {
+  for (uint8_t i = 0; i < retry; i++) {
+    if (send_report(report, len) == 0) {
+      return;
+    }
+    k_sleep(USB_SEND_INTERVAL);
+  }
+}
+
+static void hid_send_worker(void) {
+  hid_queue_item item;
+  while (true) {
+    k_msgq_get(&hid_report_queue, &item, K_FOREVER);
+    switch (item.type) {
+    case Keyboard:
+      send_report_with_retry((uint8_t *)&(item.report.keyboard_report.report_id),
+                  KEYBOARD_REPORT_SIZE, 5);
+      break;
+#if CONFIG_EXTRAKEY_ENABLE
+    case Consumer:
+      send_report_with_retry((uint8_t *)&(item.report.consume_report),
+                  sizeof(report_extra_t), 5);
+      break;
+#endif /* CONFIG_EXTRAKEY_ENABLE */
+    default:
+      break;
+    }
+    // sleep for a small period of time to send next HID package  for some host
+    // os will do debounce internally.
+    k_sleep(USB_SEND_INTERVAL);
+  }
+}
+
+K_THREAD_DEFINE(hid_send, 1024, hid_send_worker, NULL, NULL, NULL, 7, 0, 0);
