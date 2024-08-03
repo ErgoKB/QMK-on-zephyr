@@ -1,5 +1,8 @@
 #include "usb_main.h"
 #include "hid.h"
+#if CONFIG_RAW_ENABLE
+#include "raw_hid.h"
+#endif /* CONFIG_RAW_ENABLE */
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
