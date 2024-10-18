@@ -13,6 +13,7 @@ add_compile_definitions(KEYMAP_C="keymap.h")
 add_compile_definitions(PERMISSIVE_HOLD)
 add_compile_definitions(IGNORE_MOD_TAP_INTERRUPT)
 add_compile_definitions(TAPPING_TOGGLE=2)
+add_compile_definitions(QMK_KEYS_PER_SCAN=4)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(qmk_on_zephyr)
