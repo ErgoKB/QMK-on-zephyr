@@ -72,7 +72,6 @@ target_sources(
           lib/qmk_firmware/quantum/keycode_config.c
           lib/qmk_firmware/quantum/eeconfig.c
           lib/qmk_firmware/quantum/bitwise.c
-          lib/qmk_firmware/quantum/matrix_common.c
           lib/qmk_firmware/quantum/debounce/none.c
           lib/qmk_firmware/quantum/logging/print.c
           lib/qmk_firmware/quantum/logging/sendchar.c

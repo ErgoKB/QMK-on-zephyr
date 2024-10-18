@@ -7,9 +7,18 @@
 
 #define ROW_SIZE (sizeof(matrix_row_t) * 8)
 
+matrix_row_t matrix[MATRIX_ROWS];
+
 static matrix_row_t changed_pos[MATRIX_ROWS];
 
-bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+matrix_row_t matrix_get_row(uint8_t row) {
+    return matrix[row];
+}
+
+void matrix_print(void) {}
+void matrix_init(void) {}
+
+uint8_t matrix_scan(void) {
   int32_t events = 0;
   bool changed = false;
   struct key_event ev;
@@ -31,15 +40,15 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     int col = ev.position % ROW_SIZE;
     // if this bit is changed in this loop, do not apply the change, but leave
     // it to the next matrix scan call.
-    if (changed_pos[row]&BIT(col)) {
-        return changed;
+    if (changed_pos[row] & BIT(col)) {
+      return changed;
     }
     changed_pos[row] |= BIT(col);
 
     if (ev.pressed) {
-      current_matrix[row] |= BIT(col);
+      matrix[row] |= BIT(col);
     } else {
-      current_matrix[row] &= ~((matrix_row_t)BIT(col));
+      matrix[row] &= ~((matrix_row_t)BIT(col));
     }
 
     // In the end, pop the top event.
