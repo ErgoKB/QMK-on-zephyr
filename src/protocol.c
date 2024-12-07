@@ -14,9 +14,9 @@ void protocol_post_init(void) {}
 
 void protocol_pre_task(void) {
 #if IS_ENABLED(CONFIG_BT)
-  // Force QMK running in main thread to sleep, and give away CPU time for BT
-  // stack, so BT SMP can finish pairing.
-  k_msleep(1);
+  // Proactively yield itself for cooperative multitasking. Give away CPU time
+  // for BT and other threads, such that BT SMP can finish pairing.
+  k_usleep(1);
 #endif /* IS_ENABLED(CONFIG_BT) */
 }
 void protocol_post_task(void) {
@@ -25,9 +25,9 @@ void protocol_post_task(void) {
 #endif /* CONFIG_RAW_ENABLE */
 
 #if IS_ENABLED(CONFIG_BT)
-  // Force QMK running in main thread to sleep, and give away CPU time for BT
-  // stack, so BT SMP can finish pairing.
-  k_msleep(1);
+  // Proactively yield itself for cooperative multitasking. Give away CPU time
+  // for BT and other threads, such that BT SMP can finish pairing.
+  k_usleep(1);
 #endif /* IS_ENABLED(CONFIG_BT) */
 }
 
