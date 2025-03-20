@@ -86,11 +86,6 @@ static int send_report(uint8_t *report, size_t len) {
   switch (usb_status) {
   case USB_DC_SUSPEND:
     return usb_wakeup_request();
-  case USB_DC_ERROR:
-  case USB_DC_RESET:
-  case USB_DC_DISCONNECTED:
-  case USB_DC_UNKNOWN:
-    return -ENODEV;
   default:
     return hid_int_ep_write(hid_dev, report, len, NULL);
   }
