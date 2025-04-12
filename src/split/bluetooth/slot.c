@@ -6,58 +6,75 @@
 
 struct peripheral_slot peripherals[ZMK_BLE_SPLIT_PERIPHERAL_COUNT];
 
+K_MUTEX_DEFINE(slot_mutex);
+
 bool has_open_slot(void) {
+  bool ret = false;
+
+  k_mutex_lock(&slot_mutex, K_FOREVER);
   for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
-    if (peripherals[i].state == PERIPHERAL_SLOT_STATE_OPEN) {
-      return true;
+    if (!peripherals[i].occupied) {
+      ret = true;
+      goto exit_has_open_slot;
     }
   }
-  return false;
+exit_has_open_slot:
+  k_mutex_unlock(&slot_mutex);
+  return ret;
 }
 
-int reserve_peripheral_slot(const bt_addr_le_t *addr) {
+int request_peripheral_slot(const bt_addr_le_t *addr,
+                            struct peripheral_slot **slot) {
+  int ret = 0;
+
+  k_mutex_lock(&slot_mutex, K_FOREVER);
   for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
     if (!bt_addr_le_cmp(bt_conn_get_dst(peripherals[i].conn), addr)) {
-      peripherals[i].state = PERIPHERAL_SLOT_STATE_CONNECTING;
-      return i;
+      *slot = &peripherals[i];
+      goto exit_reserve_peripheral_slot;
     }
   }
 
   for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
-    if (peripherals[i].state == PERIPHERAL_SLOT_STATE_OPEN) {
-      peripherals[i].state = PERIPHERAL_SLOT_STATE_CONNECTING;
-      return i;
+    if (!peripherals[i].occupied) {
+      peripherals[i].occupied = true;
+      *slot = &peripherals[i];
+      goto exit_reserve_peripheral_slot;
     }
   }
-  return -ENOMEM;
+
+  ret = -ENOMEM;
+exit_reserve_peripheral_slot:
+  k_mutex_unlock(&slot_mutex);
+  return ret;
 }
 
-void confirm_peripheral_slot_conn(struct bt_conn *conn) {
+int get_slot_by_connection(struct bt_conn *conn,
+                           struct peripheral_slot **slot) {
+  int res = 0;
+
+  k_mutex_lock(&slot_mutex, K_FOREVER);
   for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
     if (peripherals[i].conn == conn) {
-      peripherals[i].state = PERIPHERAL_SLOT_STATE_CONNECTED;
-      return;
+      *slot = &peripherals[i];
+      goto exit_get_slot_by_connection;
     }
   }
+
+  res = -ENODEV;
+exit_get_slot_by_connection:
+  k_mutex_unlock(&slot_mutex);
+  return res;
 }
 
-struct peripheral_slot *get_slot_by_connection(struct bt_conn *conn) {
-  for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
-    if (peripherals[i].conn == conn) {
-      return &peripherals[i];
-    }
-  }
-  return NULL;
-}
-
-void release_peripheral_slot(int index) {
-  struct peripheral_slot *slot = &peripherals[index];
+void release_peripheral_slot(struct peripheral_slot *slot) {
+  k_mutex_lock(&slot_mutex, K_FOREVER);
 
   if (slot->conn != NULL) {
     bt_conn_unref(slot->conn);
     slot->conn = NULL;
   }
-  slot->state = PERIPHERAL_SLOT_STATE_OPEN;
+  slot->occupied = false;
 
   for (int i = 0; i < POSITION_STATE_DATA_LEN; i++) {
     slot->position_state[i] = 0U;
@@ -67,12 +84,6 @@ void release_peripheral_slot(int index) {
   // Clean up previously discovered handles;
   slot->subscribe_params.value_handle = 0;
   slot->run_behavior_handle = 0;
-}
 
-void release_peripheral_slot_for_conn(struct bt_conn *conn) {
-  for (int i = 0; i < ARRAY_SIZE(peripherals); i++) {
-    if (peripherals[i].conn == conn) {
-      return release_peripheral_slot(i);
-    }
-  }
+  k_mutex_unlock(&slot_mutex);
 }
