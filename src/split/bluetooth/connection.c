@@ -276,11 +276,6 @@ static bool parse_device_data(struct bt_data *data, void *user_data) {
 
 static bool try_connect_split_device(const bt_addr_le_t *addr,
                                      struct peripheral_slot *slot) {
-  slot->conn = bt_conn_lookup_addr_le(BT_ID_DEFAULT, addr);
-  if (slot->conn) {
-    LOG_DBG("Found existing connection");
-    return true;
-  }
   struct bt_le_conn_param *param = BT_LE_CONN_PARAM(0x0006, 0x0006, 0, 40);
 
   LOG_DBG("Initiating new connection");
