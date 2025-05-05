@@ -16,9 +16,12 @@ For general documentation for how to write git commit messages, check out [How t
 
 ## Development
 
-Currently, this project is based on Zephyr 3.2.0. To set up the development
+Currently, this project is based on Zephyr 3.7.1. To set up the development
 
-- First, follow the official [Zephyr guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
+- First, follow the official [Zephyr guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).  
+  You may need to switch the zephyr version either by:
+  - west init with the version 3.7.1, or
+  - git checkout to v3.7.1 for the `zephyr` directory, and run `west update`
 - Clone this project including submodule.
 - Run build via
 
